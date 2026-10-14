@@ -339,6 +339,42 @@ Make interactive elements *obvious*: button press states (scale down, darken), a
 | **Bubble** | No-code SaaS platform, hosted backend, visual workflow logic | **Logic without code**: "when button clicked → show this panel" — visual state machine wiring | Not applicable — Sanctum is desktop-first, no hosted backend. FSM already covers state logic. |
 | **Fabric.js / PixiJS** | Canvas libraries for interactive shape creators, vector editing, GPU-accelerated rendering | True vector/2D canvas surface instead of DOM-based artboard | Addable if moving from DOM to canvas rendering — would enable infinite canvas, vector tools, drag-and-drop layers. |
 
+### Wallpaper Theme Extraction (feature spec)
+
+**Concept:** User picks any wallpaper image (or the current OS desktop background). Sanctum extracts its dominant colours and generates a full matching theme set so the UI harmonises with the user's chosen background. No two users get the same look — the UI adapts to *their* environment.
+
+**Pipeline:**
+1. **Input** — user selects an image file, or Sanctum reads the current Windows desktop wallpaper (`%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Themes\TranscodedWallpaper.jpg`)
+2. **Downsample** — resize to 64×64 (or 100×100) for fast colour analysis
+3. **Extract palette** — k-means clustering (k=5) over pixel colours to find 5 dominant colours. Sort by frequency/coverage.
+4. **Map to roles** — assign extracted colours to theme tokens by luminance + saturation logic:
+   - **Darkest** → `surfaceCanvas` (app background)
+   - **2nd darkest** → `surfaceCard` (panels)
+   - **Mid-tone, low saturation** → `surfaceBorder` (dividers)
+   - **Brightest, high saturation** → `actionPrimary` (accent)
+   - **Lightest** → `textPrimary` (body text)
+   - Derive `textSecondary` at 60% opacity of textPrimary
+   - Derive `actionDanger` as complementary hue, same saturation
+5. **Validate contrast** — run WCAG 2.2 check: textPrimary on surfaceCanvas ≥ 4.5:1. If it fails, lighten text or darken surface until it passes. Same for accent on card.
+6. **Apply** — write the generated palette to `tokens.themes.wallpaper` (new theme slot). User can toggle it on/off from the Theme dropdown. The existing dark/light/highContrast themes remain untouched.
+
+**Technical approach:**
+- Pure Node.js, no dependencies: `sharp` (image decode + resize) + manual k-means (or `quantize` algorithm) over the raw pixel buffer
+- Alternative: Canvas-based extraction in the browser (draw to `<canvas>`, read `getImageData`, cluster) — keeps it client-side, no server round-trip
+- The extraction is a one-shot operation (pick wallpaper → get theme), not continuous
+
+**UI affordance:**
+- In the Design Options modal: a 7th slot "Wallpaper" with an image picker + "Extract Theme" button
+- Preview: show the 5 extracted swatches + the generated theme before applying
+- "Use Desktop Wallpaper" button (reads the current OS background)
+- Generated theme appears in the Theme dropdown as "Wallpaper: [filename]"
+
+**Constraints:**
+- The extracted theme must still respect the type scale and spacing scale (only colours change, not layout)
+- Contrast validation is mandatory — an unreadable theme is a bug, not a feature
+- User can override any individual colour after extraction (per-token override, like the existing inspector)
+- Cache: same wallpaper file → same theme (hash the file, skip re-extraction)
+
 ### Sanctum Studio Design Requirements (from user direction)
 
 **The core principle: coherent composition system, not cosmetic dials.**
