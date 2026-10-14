@@ -1,0 +1,12 @@
+{
+  "name": "sanctum-studio",
+  "version": "1.0.0",
+  "description": "Desktop Design Application & Agentic Code-Generation Engine based on the Sanctum UX Handbook",
+  "author": "Sanctum Team",
+  "sidecars": [
+    {
+      "name": "studio-panel",
+      "path": "sidecars/studio-panel"
+    }
+  ]
+}

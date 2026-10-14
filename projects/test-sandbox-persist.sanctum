@@ -1,0 +1,173 @@
+{
+  "version": "1.0.0",
+  "meta": {
+    "title": "Test Persistent Project",
+    "subtype": "testing_coding_sandbox",
+    "primaryPlatform": "compose_desktop",
+    "createdAt": "2026-10-14T18:33:09.487Z",
+    "updatedAt": "2026-10-14T18:33:09.487Z"
+  },
+  "tokens": {
+    "foundation": {
+      "color": {
+        "obsidian": "#0B0C10",
+        "slate": "#1A1D26",
+        "border": "#272B37",
+        "violet": "#9A8CFF",
+        "pink": "#E056FD",
+        "orange": "#FF8A65",
+        "danger": "#F47B74",
+        "success": "#5EEAD4",
+        "textMuted": "#959CB1",
+        "textLight": "#ECEEF5"
+      },
+      "space": {
+        "xs": "0.25em",
+        "sm": "0.5em",
+        "md": "1.0em",
+        "lg": "1.5em",
+        "xl": "2.0em"
+      },
+      "typography": {
+        "fontSans": "IBM Plex Sans",
+        "fontMono": "IBM Plex Mono",
+        "baseSizePx": 16
+      }
+    },
+    "semantic": {
+      "surfaceCanvas": "{color.obsidian}",
+      "surfaceCard": "{color.slate}",
+      "surfaceBorder": "{color.border}",
+      "actionPrimary": "{color.violet}",
+      "actionDanger": "{color.danger}",
+      "textPrimary": "{color.textLight}",
+      "textSecondary": "{color.textMuted}",
+      "statusQueued": "{color.textMuted}",
+      "statusRunning": "{color.violet}",
+      "statusCompleted": "{color.success}",
+      "statusFailed": "{color.danger}"
+    },
+    "themes": {
+      "dark": {
+        "surfaceCanvas": "#0B0C10",
+        "surfaceCard": "#13151C",
+        "surfaceBorder": "#272B37",
+        "textPrimary": "#ECEEF5",
+        "textSecondary": "#B0B6C8"
+      },
+      "light": {
+        "surfaceCanvas": "#F5F6FA",
+        "surfaceCard": "#FFFFFF",
+        "surfaceBorder": "#D8DDE8",
+        "textPrimary": "#141722",
+        "textSecondary": "#5E6680",
+        "actionPrimary": "#5B45F5",
+        "actionDanger": "#C92A2A"
+      },
+      "highContrast": {
+        "surfaceCanvas": "#000000",
+        "surfaceCard": "#101010",
+        "surfaceBorder": "#FFFFFF",
+        "textPrimary": "#FFFFFF",
+        "textSecondary": "#E0E0E0"
+      }
+    }
+  },
+  "stateModel": {
+    "states": [
+      "ready",
+      "submission_pending",
+      "accepted",
+      "running",
+      "completed",
+      "failed",
+      "cancelled"
+    ],
+    "initial": "ready",
+    "transitions": [
+      {
+        "from": "ready",
+        "event": "SUBMIT",
+        "to": "submission_pending",
+        "evidence": "request_dispatched"
+      },
+      {
+        "from": "submission_pending",
+        "event": "ACK",
+        "to": "accepted",
+        "evidence": "server_ack_id"
+      },
+      {
+        "from": "accepted",
+        "event": "START",
+        "to": "running",
+        "evidence": "worker_heartbeat"
+      },
+      {
+        "from": "running",
+        "event": "FINISH",
+        "to": "completed",
+        "evidence": "verified_checksum"
+      },
+      {
+        "from": "running",
+        "event": "ERROR",
+        "to": "failed",
+        "evidence": "error_payload"
+      },
+      {
+        "from": "running",
+        "event": "CANCEL",
+        "to": "cancelled",
+        "evidence": "user_aborted"
+      }
+    ]
+  },
+  "masterPrototype": {
+    "id": "root",
+    "type": "AppShell",
+    "name": "Application Shell",
+    "props": {
+      "sidebarCollapsed": false,
+      "containerQueries": true,
+      "density": "standard"
+    },
+    "children": []
+  },
+  "scenarios": [
+    {
+      "id": "desktop_100_ready",
+      "title": "Desktop 100% · Ready",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "scale": 1,
+      "activeState": "ready",
+      "theme": "dark"
+    },
+    {
+      "id": "desktop_150_running",
+      "title": "Desktop 150% · Running",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "scale": 1.5,
+      "activeState": "running",
+      "theme": "dark"
+    },
+    {
+      "id": "mobile_390_ready",
+      "title": "Mobile 390px · Ready",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scale": 1,
+      "activeState": "ready",
+      "theme": "dark"
+    }
+  ],
+  "qaEvidence": []
+}

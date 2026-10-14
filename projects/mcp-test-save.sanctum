@@ -1,0 +1,319 @@
+{
+  "version": "1.0.0",
+  "meta": {
+    "title": "Creative PMV Studio",
+    "subtype": "creative_document_editor",
+    "primaryPlatform": "compose_desktop",
+    "createdAt": "2026-10-14T18:33:09.471Z",
+    "updatedAt": "2026-10-14T18:33:09.472Z"
+  },
+  "tokens": {
+    "foundation": {
+      "color": {
+        "obsidian": "#0B0C10",
+        "slate": "#1A1D26",
+        "border": "#272B37",
+        "violet": "#9A8CFF",
+        "pink": "#E056FD",
+        "orange": "#FF8A65",
+        "danger": "#F47B74",
+        "success": "#5EEAD4",
+        "textMuted": "#959CB1",
+        "textLight": "#ECEEF5"
+      },
+      "space": {
+        "xs": "0.25em",
+        "sm": "0.5em",
+        "md": "1.0em",
+        "lg": "1.5em",
+        "xl": "2.0em"
+      },
+      "typography": {
+        "fontSans": "IBM Plex Sans",
+        "fontMono": "IBM Plex Mono",
+        "baseSizePx": 16
+      }
+    },
+    "semantic": {
+      "surfaceCanvas": "{color.obsidian}",
+      "surfaceCard": "{color.slate}",
+      "surfaceBorder": "{color.border}",
+      "actionPrimary": "{color.violet}",
+      "actionDanger": "{color.danger}",
+      "textPrimary": "{color.textLight}",
+      "textSecondary": "{color.textMuted}",
+      "statusQueued": "{color.textMuted}",
+      "statusRunning": "{color.violet}",
+      "statusCompleted": "{color.success}",
+      "statusFailed": "{color.danger}"
+    },
+    "themes": {
+      "dark": {
+        "surfaceCanvas": "#0B0C10",
+        "surfaceCard": "#13151C",
+        "surfaceBorder": "#272B37",
+        "textPrimary": "#ECEEF5",
+        "textSecondary": "#B0B6C8"
+      },
+      "light": {
+        "surfaceCanvas": "#F5F6FA",
+        "surfaceCard": "#FFFFFF",
+        "surfaceBorder": "#D8DDE8",
+        "textPrimary": "#141722",
+        "textSecondary": "#5E6680",
+        "actionPrimary": "#5B45F5",
+        "actionDanger": "#C92A2A"
+      },
+      "highContrast": {
+        "surfaceCanvas": "#000000",
+        "surfaceCard": "#101010",
+        "surfaceBorder": "#FFFFFF",
+        "textPrimary": "#FFFFFF",
+        "textSecondary": "#E0E0E0"
+      }
+    }
+  },
+  "stateModel": {
+    "states": [
+      "ready",
+      "submission_pending",
+      "accepted",
+      "running",
+      "completed",
+      "failed",
+      "cancelled"
+    ],
+    "initial": "ready",
+    "transitions": [
+      {
+        "from": "ready",
+        "event": "SUBMIT",
+        "to": "submission_pending",
+        "evidence": "request_dispatched"
+      },
+      {
+        "from": "submission_pending",
+        "event": "ACK",
+        "to": "accepted",
+        "evidence": "server_ack_id"
+      },
+      {
+        "from": "accepted",
+        "event": "START",
+        "to": "running",
+        "evidence": "worker_heartbeat"
+      },
+      {
+        "from": "running",
+        "event": "FINISH",
+        "to": "completed",
+        "evidence": "verified_checksum"
+      },
+      {
+        "from": "running",
+        "event": "ERROR",
+        "to": "failed",
+        "evidence": "error_payload"
+      },
+      {
+        "from": "running",
+        "event": "CANCEL",
+        "to": "cancelled",
+        "evidence": "user_aborted"
+      }
+    ]
+  },
+  "masterPrototype": {
+    "id": "root",
+    "type": "AppShell",
+    "name": "Creative Studio Shell",
+    "props": {
+      "workflow": "PMV Beat Sync",
+      "containerQueries": true
+    },
+    "children": [
+      {
+        "id": "top_identity_bar",
+        "type": "IdentityBar",
+        "name": "Studio Control Bar",
+        "props": {
+          "title": "Project: Cybernetic Trance 01",
+          "workflowBadge": "PMV Active",
+          "badgeColor": "#e056fd",
+          "controls": [
+            "preset_select",
+            "kit_select",
+            "reload",
+            "save",
+            "render"
+          ]
+        }
+      },
+      {
+        "id": "editor_stage",
+        "type": "WorkspaceContainer",
+        "name": "Editor Stage Area",
+        "props": {
+          "layout": "stage_and_inspector"
+        },
+        "children": [
+          {
+            "id": "viewport_timeline_column",
+            "type": "ViewportColumn",
+            "name": "Preview & Timeline Column",
+            "children": [
+              {
+                "id": "video_preview_card",
+                "type": "CardWidget",
+                "name": "Live Video Viewport",
+                "props": {
+                  "title": "Playback Monitor",
+                  "elevation": "card"
+                },
+                "children": [
+                  {
+                    "id": "video_screen",
+                    "type": "CanvasDisplay",
+                    "props": {
+                      "aspectRatio": "16:9",
+                      "placeholder": "Preview Stage (1080p 60fps)"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "beat_timeline_card",
+                "type": "CardWidget",
+                "name": "Beat Sync Timeline",
+                "props": {
+                  "title": "Multi-Track Beat Grid",
+                  "elevation": "card"
+                },
+                "children": [
+                  {
+                    "id": "waveform_track",
+                    "type": "WaveformTrack",
+                    "props": {
+                      "bpm": 128,
+                      "transients": 48,
+                      "syncMode": "Drop Lock"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "inspector_sidebar",
+            "type": "InspectorColumn",
+            "name": "Properties Inspector",
+            "props": {
+              "widthEm": "22em"
+            },
+            "children": [
+              {
+                "id": "clip_params_card",
+                "type": "CardWidget",
+                "name": "Clip FX Inspector",
+                "props": {
+                  "title": "Cut & Strobe Parameters"
+                },
+                "children": [
+                  {
+                    "id": "cut_interval",
+                    "type": "FormRow",
+                    "props": {
+                      "label": "Cut Interval",
+                      "widget": "SpinBox",
+                      "value": "4 beats"
+                    }
+                  },
+                  {
+                    "id": "motion_blur",
+                    "type": "FormRow",
+                    "props": {
+                      "label": "Motion Blur",
+                      "widget": "Slider",
+                      "value": "0.45"
+                    }
+                  },
+                  {
+                    "id": "color_grade",
+                    "type": "FormRow",
+                    "props": {
+                      "label": "LUT Preset",
+                      "widget": "Dropdown",
+                      "value": "Neon Obsidian"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cmp_button_mv8g6xr4_ea4r",
+        "type": "Button",
+        "name": "Action Button",
+        "category": "atoms",
+        "props": {
+          "label": "MCP Deployed Button",
+          "variant": "primary",
+          "size": "medium",
+          "stateBinding": "ready",
+          "disabled": false,
+          "alignment": "left",
+          "widthPct": 100,
+          "gap": 8,
+          "padding": 16,
+          "accentColor": null,
+          "radius": 8,
+          "fill": null,
+          "texture": "flat",
+          "borderWidth": 1,
+          "borderColor": null,
+          "bold": false,
+          "italic": false,
+          "underline": false
+        }
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "desktop_100_ready",
+      "title": "Desktop 100% · Ready",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "scale": 1,
+      "activeState": "ready",
+      "theme": "dark"
+    },
+    {
+      "id": "desktop_150_running",
+      "title": "Desktop 150% · Running",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "scale": 1.5,
+      "activeState": "running",
+      "theme": "dark"
+    },
+    {
+      "id": "mobile_390_ready",
+      "title": "Mobile 390px · Ready",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scale": 1,
+      "activeState": "ready",
+      "theme": "dark"
+    }
+  ],
+  "qaEvidence": []
+}

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sanctum Render — Live Output</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    body { overflow: auto; }
+    .render-chrome {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+    .render-chrome .left { display: flex; align-items: center; gap: 10px; }
+    .render-chrome .right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .render-chrome .live { color: var(--success); font-weight: 600; font-family: var(--font-mono); }
+    .render-chrome .state-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+    }
+    .render-ctl {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .render-ctl label { font-weight: 500; }
+    .render-ctl select, .render-ctl input[type=range] {
+      background: var(--bg-app);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 2px 6px;
+    }
+    .render-ctl input[type=range] { padding: 0; width: 100px; accent-color: var(--accent); }
+    .render-ctl .rbtn {
+      background: var(--bg-app);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 3px 10px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+    }
+    .render-ctl .rbtn:hover { border-color: var(--accent); color: var(--accent); }
+    .render-ctl .rbtn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); }
+    .render-stage {
+      padding: 32px;
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="render-chrome">
+    <div class="left">
+      <strong style="color: var(--text-primary);">Sanctum Render</strong>
+      <span class="live" id="live-dot">● LIVE</span>
+      <span style="color: var(--text-tertiary);" id="doc-title">—</span>
+    </div>
+    <div class="right">
+      <span class="state-badge" id="render-state-badge">READY</span>
+      <div class="render-ctl">
+        <label>State</label>
+        <select id="ctl-state">
+          <option value="ready">ready</option>
+          <option value="accepted">accepted</option>
+          <option value="running">running</option>
+          <option value="completed">completed</option>
+        </select>
+      </div>
+      <div class="render-ctl">
+        <label>Theme</label>
+        <select id="ctl-theme">
+          <option value="dark">dark</option>
+          <option value="light">light</option>
+        </select>
+      </div>
+      <div class="render-ctl">
+        <label>Zoom</label>
+        <input type="range" id="ctl-scale" min="40" max="140" step="5" value="100">
+        <span id="render-scale-label" style="font-family: var(--font-mono); color: var(--accent);">100%</span>
+      </div>
+      <div class="render-ctl">
+        <button class="rbtn" id="ctl-fit">Fit</button>
+        <button class="rbtn" id="ctl-100">100%</button>
+      </div>
+    </div>
+  </div>
+  <div class="render-stage" id="render-stage">
+    <div style="color: var(--text-tertiary); font-size: 13px; padding: 40px;">Waiting for Studio window…</div>
+  </div>
+
+  <script type="module">
+    import { renderArtboardContent } from './render-engine.js';
+
+    let currentDoc = null;
+    let currentState = 'ready';
+    let currentScale = 1.0;
+    let currentTheme = 'dark';
+
+    const stateBadge = document.getElementById('render-state-badge');
+    const scaleLabel = document.getElementById('render-scale-label');
+    const docTitle = document.getElementById('doc-title');
+    const stage = document.getElementById('render-stage');
+    const ctlState = document.getElementById('ctl-state');
+    const ctlTheme = document.getElementById('ctl-theme');
+    const ctlScale = document.getElementById('ctl-scale');
+
+    function applyTheme(theme) {
+      const themes = currentDoc?.tokens?.themes || {};
+      const t = themes[theme];
+      if (!t) return;
+      const root = document.documentElement;
+      root.style.setProperty('--bg-app', t.surfaceCanvas || '');
+      root.style.setProperty('--bg-surface', t.surfaceCard || t.surfaceCanvas || '');
+      root.style.setProperty('--bg-card', t.surfaceCard || '');
+      root.style.setProperty('--text-primary', t.textPrimary || '');
+      root.style.setProperty('--text-secondary', t.textSecondary || '');
+      if (t.actionPrimary) root.style.setProperty('--accent', t.actionPrimary);
+      if (t.actionDanger) root.style.setProperty('--danger', t.actionDanger);
+    }
+
+    function render() {
+      if (!currentDoc) return;
+      const { desktopHtml, mobileHtml } = renderArtboardContent(currentDoc, currentState);
+      const fs = 16 * currentScale;
+      stage.innerHTML = `
+        <div class="artboard-frame" style="width: 820px; min-height: 580px;">
+          <div class="artboard-header">
+            <span>Desktop · 1280 × 800</span>
+            <span>${Math.round(currentScale * 100)}%</span>
+          </div>
+          <div class="artboard-viewport" style="font-size: ${fs}px;">${desktopHtml}</div>
+        </div>
+        <div class="artboard-frame" style="width: 360px; min-height: 580px;">
+          <div class="artboard-header">
+            <span>Mobile · 390 × 844</span>
+            <span>${Math.round(currentScale * 100)}%</span>
+          </div>
+          <div class="artboard-viewport" style="font-size: ${fs}px;">${mobileHtml}</div>
+        </div>
+      `;
+      stateBadge.textContent = currentState.toUpperCase();
+      scaleLabel.textContent = `${Math.round(currentScale * 100)}%`;
+      docTitle.textContent = currentDoc?.meta?.title || 'Untitled';
+      ctlState.value = currentState;
+      ctlTheme.value = currentTheme;
+      ctlScale.value = Math.round(currentScale * 100);
+      applyTheme(currentTheme);
+    }
+
+    // Self-contained controls
+    ctlState.addEventListener('change', () => { currentState = ctlState.value; render(); });
+    ctlTheme.addEventListener('change', () => { currentTheme = ctlTheme.value; render(); });
+    ctlScale.addEventListener('input', () => {
+      currentScale = Number(ctlScale.value) / 100;
+      render();
+    });
+    document.getElementById('ctl-fit').addEventListener('click', () => {
+      currentScale = 0.6;
+      render();
+    });
+    document.getElementById('ctl-100').addEventListener('click', () => {
+      currentScale = 1.0;
+      render();
+    });
+
+    // Receive updates from Studio window
+    window.addEventListener('message', (e) => {
+      if (e.origin !== window.location.origin) return;
+      const d = e.data;
+      if (!d || d.type !== 'sanctum-render-update') return;
+      currentDoc = d.doc;
+      // Studio is the source of truth for state/theme; its zoom is separate
+      if (d.state) currentState = d.state;
+      if (d.theme) currentTheme = d.theme;
+      if (d.scale) currentScale = d.scale;
+      render();
+    });
+
+    // Initial: try to load from server
+    async function initialLoad() {
+      try {
+        const res = await fetch('/api/doc');
+        if (res.ok) {
+          currentDoc = await res.json();
+          currentTheme = currentDoc?.meta?.theme || 'dark';
+          render();
+        }
+      } catch (e) { /* Studio will push */ }
+    }
+    initialLoad();
+  </script>
+</body>
+</html>
