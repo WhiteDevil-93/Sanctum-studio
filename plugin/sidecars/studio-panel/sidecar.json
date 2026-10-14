@@ -1,0 +1,11 @@
+{
+  "name": "studio-panel",
+  "version": "1.0.0",
+  "entrypoint": "main.mjs",
+  "ui": {
+    "title": "Sanctum Studio",
+    "description": "Desktop Design Application & Code Generation IDE",
+    "entrypoint": "index.html",
+    "icon": "../../assets/logo.svg"
+  }
+}

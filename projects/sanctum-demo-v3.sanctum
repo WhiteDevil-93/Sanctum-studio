@@ -1,0 +1,332 @@
+{
+  "version": "1.0.0",
+  "meta": {
+    "title": "Sanctum Agent Hub",
+    "subtype": "ai_assistant_delegation",
+    "primaryPlatform": "compose_desktop",
+    "createdAt": "2026-10-14T18:12:32.750Z",
+    "updatedAt": "2026-10-14T18:19:23.035Z",
+    "theme": "brutalist"
+  },
+  "tokens": {
+    "foundation": {
+      "color": {
+        "obsidian": "#0B0C10",
+        "slate": "#1A1D26",
+        "border": "#272B37",
+        "violet": "#9A8CFF",
+        "pink": "#E056FD",
+        "orange": "#FF8A65",
+        "danger": "#F47B74",
+        "success": "#5EEAD4",
+        "textMuted": "#959CB1",
+        "textLight": "#ECEEF5"
+      },
+      "space": {
+        "xs": "0.25em",
+        "sm": "0.5em",
+        "md": "1.0em",
+        "lg": "1.5em",
+        "xl": "2.0em"
+      },
+      "typography": {
+        "fontSans": "Georgia, \"Times New Roman\", serif",
+        "fontMono": "IBM Plex Mono, monospace",
+        "baseSizePx": 17
+      },
+      "density": {
+        "gapMultiplier": 1.2,
+        "padMultiplier": 1.2
+      },
+      "shape": {
+        "controlRadius": 12,
+        "surfaceRadius": 16
+      },
+      "surface": {
+        "texture": "scanlines"
+      }
+    },
+    "semantic": {
+      "surfaceCanvas": "{color.obsidian}",
+      "surfaceCard": "{color.slate}",
+      "surfaceBorder": "{color.border}",
+      "actionPrimary": "{color.violet}",
+      "actionDanger": "{color.danger}",
+      "textPrimary": "{color.textLight}",
+      "textSecondary": "{color.textMuted}",
+      "statusQueued": "{color.textMuted}",
+      "statusRunning": "{color.violet}",
+      "statusCompleted": "{color.success}",
+      "statusFailed": "{color.danger}"
+    },
+    "themes": {
+      "dark": {
+        "surfaceCanvas": "#0B0C10",
+        "surfaceCard": "#13151C",
+        "surfaceBorder": "#272B37",
+        "textPrimary": "#ECEEF5",
+        "textSecondary": "#B0B6C8"
+      },
+      "light": {
+        "surfaceCanvas": "#F5F6FA",
+        "surfaceCard": "#FFFFFF",
+        "surfaceBorder": "#D8DDE8",
+        "textPrimary": "#141722",
+        "textSecondary": "#5E6680",
+        "actionPrimary": "#5B45F5",
+        "actionDanger": "#C92A2A"
+      },
+      "highContrast": {
+        "surfaceCanvas": "#000000",
+        "surfaceCard": "#101010",
+        "surfaceBorder": "#FFFFFF",
+        "textPrimary": "#FFFFFF",
+        "textSecondary": "#E0E0E0"
+      },
+      "brutalist": {
+        "surfaceCanvas": "#0A0A0A",
+        "surfaceCard": "#111111",
+        "surfaceBorder": "#FFFFFF",
+        "textPrimary": "#FFFFFF",
+        "textSecondary": "#BFBFBF",
+        "actionPrimary": "#FFD400",
+        "actionDanger": "#FF0000"
+      }
+    }
+  },
+  "stateModel": {
+    "states": [
+      "ready",
+      "submission_pending",
+      "accepted",
+      "running",
+      "completed",
+      "failed",
+      "cancelled"
+    ],
+    "initial": "ready",
+    "transitions": [
+      {
+        "from": "ready",
+        "event": "SUBMIT",
+        "to": "submission_pending",
+        "evidence": "request_dispatched"
+      },
+      {
+        "from": "submission_pending",
+        "event": "ACK",
+        "to": "accepted",
+        "evidence": "server_ack_id"
+      },
+      {
+        "from": "accepted",
+        "event": "START",
+        "to": "running",
+        "evidence": "worker_heartbeat"
+      },
+      {
+        "from": "running",
+        "event": "FINISH",
+        "to": "completed",
+        "evidence": "verified_checksum"
+      },
+      {
+        "from": "running",
+        "event": "ERROR",
+        "to": "failed",
+        "evidence": "error_payload"
+      },
+      {
+        "from": "running",
+        "event": "CANCEL",
+        "to": "cancelled",
+        "evidence": "user_aborted"
+      }
+    ]
+  },
+  "masterPrototype": {
+    "id": "root",
+    "type": "AppShell",
+    "name": "Sanctum Shell",
+    "props": {
+      "domains": [
+        "Control Center",
+        "HypnoForge",
+        "ForgeHub",
+        "Qwen Lab"
+      ],
+      "activeDomain": "Control Center",
+      "containerQueries": true
+    },
+    "children": [
+      {
+        "id": "sidebar_rail",
+        "type": "NavigationRail",
+        "name": "Domain Navigation Rail",
+        "props": {
+          "items": [
+            {
+              "id": "cc",
+              "label": "Control Center",
+              "icon": "agent",
+              "badge": "Active"
+            },
+            {
+              "id": "hf",
+              "label": "HypnoForge",
+              "icon": "palette",
+              "badge": "2 tasks"
+            },
+            {
+              "id": "fh",
+              "label": "ForgeHub",
+              "icon": "hub",
+              "badge": "Online"
+            },
+            {
+              "id": "qw",
+              "label": "Qwen Lab",
+              "icon": "terminal",
+              "badge": "Proposed"
+            }
+          ]
+        }
+      },
+      {
+        "id": "main_workspace",
+        "type": "WorkspaceContainer",
+        "name": "Central Agent Workspace",
+        "props": {
+          "layout": "split_columns",
+          "minWidth": "0"
+        },
+        "children": [
+          {
+            "id": "agent_chat_column",
+            "type": "AgentChatView",
+            "name": "Agent Interaction Stream",
+            "props": {
+              "activeAgent": "Venice Agent",
+              "model": "gemma4_e4b_32k",
+              "showProvenance": true
+            },
+            "children": [
+              {
+                "id": "approval_gate_card",
+                "type": "ApprovalGateCard",
+                "name": "Approval Gate",
+                "props": {
+                  "title": "Tool Approval Required",
+                  "tool": "cloud_render_submit",
+                  "costEstimate": "$0.40",
+                  "target": "Vast.ai Instance #9021",
+                  "status": "AWAITING_CONFIRMATION"
+                }
+              },
+              {
+                "id": "tool_execution_log",
+                "type": "ToolExecutionTimeline",
+                "name": "Tool Execution Flow",
+                "props": {
+                  "steps": [
+                    {
+                      "step": 1,
+                      "name": "Inspect Local Index",
+                      "status": "COMPLETED",
+                      "evidence": "index.sqlite: 42 rows"
+                    },
+                    {
+                      "step": 2,
+                      "name": "Prepare Render Pack",
+                      "status": "COMPLETED",
+                      "evidence": "bundle.zip: 14MB"
+                    },
+                    {
+                      "step": 3,
+                      "name": "Sync to Remote Worker",
+                      "status": "RUNNING",
+                      "evidence": "48% uploaded"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "task_rack",
+            "type": "TaskMonitoringRack",
+            "name": "Active Tasks Rack",
+            "props": {
+              "density": "compact",
+              "widthEm": "24em"
+            },
+            "children": [
+              {
+                "id": "task_item_1",
+                "type": "TaskCard",
+                "name": "Task Card #1",
+                "props": {
+                  "taskId": "task-101",
+                  "domain": "HypnoForge",
+                  "title": "Synthesize PMV Sequence",
+                  "state": "RUNNING",
+                  "progress": 0.65,
+                  "allowCancel": true
+                }
+              },
+              {
+                "id": "task_item_2",
+                "type": "TaskCard",
+                "name": "Task Card #2",
+                "props": {
+                  "taskId": "task-102",
+                  "domain": "Qwen Lab",
+                  "title": "Run AST Code Audit",
+                  "state": "QUEUED",
+                  "progress": 0,
+                  "allowCancel": true
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "desktop_100_running",
+      "title": "Desktop 100% · Sanctum Delegation Active",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "scale": 1,
+      "activeState": "running",
+      "theme": "dark"
+    },
+    {
+      "id": "desktop_150_running",
+      "title": "Desktop 150% · Scaled Text Layout",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "scale": 1.5,
+      "activeState": "running",
+      "theme": "dark"
+    },
+    {
+      "id": "mobile_390_running",
+      "title": "Phone 390px · Adaptive Rail -> Bottom Bar",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scale": 1,
+      "activeState": "running",
+      "theme": "dark"
+    }
+  ],
+  "qaEvidence": []
+}

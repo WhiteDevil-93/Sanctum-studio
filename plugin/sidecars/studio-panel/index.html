@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sanctum Studio Panel</title>
+  <script src="/preload.js"></script>
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0B0C10; }
+    iframe { width: 100%; height: 100%; border: none; }
+  </style>
+</head>
+<body>
+  <iframe src="http://127.0.0.1:4180/" id="studio-frame"></iframe>
+  <script>
+    window.addEventListener('message', (event) => {
+      // Bridge between Antigravity agent context and embedded Studio frame
+      const frame = document.getElementById('studio-frame');
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage(event.data, '*');
+      }
+    });
+  </script>
+</body>
+</html>

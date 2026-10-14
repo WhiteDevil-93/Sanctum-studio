@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sanctum Studio · Desktop Design Engineering IDE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+  <!-- Top Studio Header -->
+  <header class="studio-header">
+    <div class="brand-group">
+      <div class="brand-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        Sanctum Studio
+      </div>
+      <span class="brand-badge">UX Handbook IDE</span>
+    </div>
+
+    <div class="controls-group">
+      <button id="btn-new-project" class="studio-btn" title="Create blank design canvas">+ Blank Canvas</button>
+      <button id="btn-save-project" class="studio-btn" title="Save project to .sanctum file">Save .sanctum</button>
+      <button id="btn-open-project" class="studio-btn" title="Open saved .sanctum project">Open Project</button>
+
+      <label style="font-size: 12px; color: var(--text-secondary)">Preset Subtype:</label>
+      <select id="preset-selector" class="studio-select" style="min-width: 200px;"></select>
+
+      <label style="font-size: 12px; color: var(--text-secondary)">Theme:</label>
+      <select id="theme-selector" class="studio-select">
+        <option value="dark">Dark Theme</option>
+        <option value="light">Light Theme</option>
+        <option value="highContrast">High Contrast</option>
+      </select>
+
+      <button id="btn-design-options" class="studio-btn" style="border-color: var(--accent-teal); color: var(--accent-teal);" title="Pick the global design language — theme, palette, type, density, shape, surface">Design Options</button>
+
+      <button id="btn-stress" class="studio-btn" title="Toggle High-Contrast Background Check">Stress BG</button>
+
+      <div style="display: flex; gap: 4px; margin-left: 4px;">
+        <button class="studio-btn scale-btn active" data-scale="1.0">100%</button>
+        <button class="studio-btn scale-btn" data-scale="1.5">150%</button>
+        <button class="studio-btn scale-btn" data-scale="2.0">200%</button>
+        <button id="btn-fit" class="studio-btn" title="Fit artboards to screen">Fit</button>
+        <span id="zoom-label" style="font-size: 12px; color: var(--text-tertiary); font-family: var(--font-mono); min-width: 36px; text-align: center;">100%</span>
+        <button id="btn-preview" class="studio-btn" title="Open the Render window — live output, updates as you work">Render</button>
+      </div>
+
+      <button id="btn-qa" class="studio-btn" style="border-color: var(--accent-teal); color: var(--accent-teal);">Run QA Audit</button>
+
+      <select id="export-target" class="studio-select">
+        <option value="compose">Compose Multiplatform (.kt)</option>
+        <option value="pyqt6">PyQt6 / CardWidget (.py)</option>
+        <option value="react">React / Tailwind (.tsx)</option>
+        <option value="dtcg">DTCG Tokens (.json)</option>
+        <option value="canvas">Design Canvas (.dc.html)</option>
+      </select>
+      <button id="btn-export" class="studio-btn studio-btn-primary">Export Code</button>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <div class="studio-body">
+
+    <!-- Left Sidebar: Presets vs Component Palette -->
+    <aside class="studio-sidebar" id="main-sidebar">
+      <!-- Sidebar Tabs -->
+      <div class="sidebar-tab-bar">
+        <button class="sidebar-tab-btn active" id="tab-presets">23 Presets</button>
+        <button class="sidebar-tab-btn" id="tab-palette">Components</button>
+      </div>
+
+      <!-- Tab Content 1: Presets List -->
+      <div id="pane-presets" class="sidebar-pane active">
+        <div class="sidebar-section-title">Interface Subtypes</div>
+        <div id="presets-list"></div>
+      </div>
+
+      <!-- Tab Content 2: Component Palette -->
+      <div id="pane-palette" class="sidebar-pane">
+        <div class="sidebar-section-title">Atoms (Basic Controls)</div>
+        <div class="palette-grid" id="palette-atoms"></div>
+
+        <div class="sidebar-section-title" style="margin-top: 14px;">Molecules (Cards & Banners)</div>
+        <div class="palette-grid" id="palette-molecules"></div>
+
+        <div class="sidebar-section-title" style="margin-top: 14px;">Organisms (Racks & Grids)</div>
+        <div class="palette-grid" id="palette-organisms"></div>
+      </div>
+    </aside>
+
+    <!-- Center Canvas Area -->
+    <main class="studio-canvas" id="canvas-area">
+
+      <!-- Canvas Quick Action Bar -->
+      <div class="canvas-quick-bar">
+        <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Blocks:</span>
+        <button class="quick-add-btn" data-key="section" style="border-color: var(--accent); color: var(--accent);">+ Section</button>
+        <button class="quick-add-btn" data-key="card_widget">+ Card</button>
+        <button class="quick-add-btn" data-key="button">+ Button</button>
+        <button class="quick-add-btn" data-key="input">+ Input</button>
+        <button class="quick-add-btn" data-key="text">+ Text</button>
+        <button class="quick-add-btn" data-key="badge">+ Badge</button>
+        <button class="quick-add-btn" data-key="metric_chip">+ Metric</button>
+        <button class="quick-add-btn" data-key="divider">+ Divider</button>
+        <button class="quick-add-btn" data-key="risk_guard">+ Risk Guard</button>
+        <button class="quick-add-btn" data-key="task_rack">+ Task Rack</button>
+        <button class="quick-add-btn" data-key="data_table">+ Table</button>
+      </div>
+
+      <!-- Viewports Wrapper -->
+      <div class="viewports-row">
+        <!-- Desktop Artboard -->
+        <div class="artboard-frame" style="width: 820px; min-height: 580px;">
+          <div class="artboard-header">
+            <span>Desktop Viewport · 1280 × 800</span>
+            <span class="scale-label" id="desktop-scale-label">Scale: 100%</span>
+          </div>
+          <div class="artboard-viewport" id="viewport-desktop"></div>
+        </div>
+
+        <!-- Mobile Artboard -->
+        <div class="artboard-frame" style="width: 360px; min-height: 580px;">
+          <div class="artboard-header">
+            <span>Mobile Viewport · 390 × 844</span>
+            <span class="scale-label" id="mobile-scale-label">Scale: 100%</span>
+          </div>
+          <div class="artboard-viewport" id="viewport-mobile"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Right Properties & State Inspector -->
+    <aside class="studio-inspector">
+
+      <!-- Selected Component Inspector -->
+      <div class="inspector-card" id="component-inspector-card">
+        <div class="inspector-title">
+          <span>Component Inspector</span>
+          <span id="selected-type-badge" class="contrast-badge">NONE</span>
+        </div>
+        <div id="component-inspector-body">
+          <p style="font-size: 11px; color: var(--text-secondary); margin: 0;">
+            Click on any element in the canvas to inspect and edit its properties.
+          </p>
+        </div>
+      </div>
+
+      <!-- FSM State Simulator -->
+      <div class="inspector-card">
+        <div class="inspector-title">
+          <span>Finite State Machine</span>
+          <span id="active-state-badge" class="contrast-badge">READY</span>
+        </div>
+        <p style="font-size: 11px; color: var(--text-secondary); margin: 0 0 10px;">
+          Simulate runtime states. No action is marked Completed until verified.
+        </p>
+        <div class="state-grid" id="state-buttons-grid">
+          <button class="state-btn active" data-state="ready">ready</button>
+          <button class="state-btn" data-state="submission_pending">pending</button>
+          <button class="state-btn" data-state="accepted">accepted</button>
+          <button class="state-btn" data-state="running">running</button>
+          <button class="state-btn" data-state="completed">completed</button>
+          <button class="state-btn" data-state="failed">failed</button>
+          <button class="state-btn" data-state="cancelled">cancelled</button>
+        </div>
+      </div>
+
+      <!-- Live Contrast & A11y HUD -->
+      <div class="inspector-card">
+        <div class="inspector-title">
+          <span>WCAG 2.2 AA Contrast HUD</span>
+          <span id="overall-contrast-pass" class="contrast-badge">PASS</span>
+        </div>
+        <div id="contrast-details" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <!-- Contract Info -->
+      <div class="inspector-card">
+        <div class="inspector-title">Subtype Risk Guard</div>
+        <div id="risk-guard-text" style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;"></div>
+      </div>
+
+      <!-- MCP Status Card -->
+      <div class="inspector-card">
+        <div class="inspector-title">MCP Integration</div>
+        <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 6px;">
+          Active Tool Engine: <code>sanctum-mcp-server</code>
+        </p>
+        <p style="font-size: 11px; color: var(--accent-teal); margin: 0;">
+          ✓ stdio server ready for Claude, Antigravity & Venice
+        </p>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- Export Code Modal -->
+  <div class="modal-overlay" id="export-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span id="modal-export-title">Export Code</span>
+        <button class="studio-btn" id="modal-export-close">Close</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="modal-code-area" class="code-area" readonly></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+          <button class="studio-btn studio-btn-primary" id="modal-copy-btn">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design Options Modal -->
+  <div class="modal-overlay" id="design-options-modal">
+    <div class="modal-window" style="max-width: 520px;">
+      <div class="modal-header">
+        <span>Design Options — global design language</span>
+        <button class="studio-btn" id="design-options-close">Close</button>
+      </div>
+      <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 13px;">
+        <label style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .04em;">Theme</span>
+          <select id="do-theme" class="studio-select"></select>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .04em;">Colour Palette</span>
+          <select id="do-palette" class="studio-select"></select>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .04em;">Typography Kit</span>
+          <select id="do-typekit" class="studio-select"></select>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .04em;">Density / Spacing</span>
+          <select id="do-density" class="studio-select"></select>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .04em;">Shape Language</span>
+          <select id="do-shape" class="studio-select"></select>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="color: var(--text-secondary); font-size: 11px; text-transform: uppercase; letter-spacing: .04em;">Surface / Texture</span>
+          <select id="do-surface" class="studio-select"></select>
+        </label>
+      </div>
+      <div style="padding: 10px 16px; font-size: 11px; color: var(--text-tertiary); border-top: 1px solid var(--border);">
+        Changes apply live to the canvas and render window. Per-block inspector values override these global defaults.
+      </div>
+    </div>
+  </div>
+
+  <!-- QA Audit Modal -->
+  <div class="modal-overlay" id="qa-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span>QA & Accessibility Verification Report</span>
+        <button class="studio-btn" id="modal-qa-close">Close</button>
+      </div>
+      <div class="modal-body">
+        <div id="qa-summary-banner" style="padding: 12px; background: rgba(94, 234, 212, 0.1); border-radius: 8px; margin-bottom: 16px;"></div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;" id="qa-report-table">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid var(--border-subtle); color: var(--text-secondary);">
+              <th style="padding: 6px;">Check</th>
+              <th style="padding: 6px;">Expected</th>
+              <th style="padding: 6px;">Observed</th>
+              <th style="padding: 6px;">Result</th>
+            </tr>
+          </thead>
+          <tbody id="qa-report-body"></tbody>
+        </table>
+      </div>
+  <!-- Project Open / Save Modal -->
+  <div class="modal-overlay" id="project-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span id="modal-project-title">Local .sanctum Projects</span>
+        <button class="studio-btn" id="modal-project-close">Close</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle); display: flex; gap: 8px;">
+          <input class="inspector-input" id="project-filename-input" placeholder="project-name" style="flex: 1;" />
+          <button class="studio-btn studio-btn-primary" id="modal-save-btn">Save Current As .sanctum</button>
+        </div>
+        <div class="sidebar-section-title" style="margin-bottom: 8px;">Saved Projects in ./projects</div>
+        <div id="saved-projects-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
