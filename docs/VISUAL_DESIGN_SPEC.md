@@ -172,35 +172,162 @@ Redo of the app's own visual layer. Follows the 7-step process from the UX Desig
 
 ---
 
-## Reference Resources & Design Ideas
+## Research Synthesis — Full Design Directives
 
-### UX/UX Design Process References
+### Source Links
 
 - **UX Design Institute — Guide to the UI Design Process**: https://www.uxdesigninstitute.com/blog/guide-to-the-ui-design-process/
-  The 7-step process: (1) User Research, (2) Define Objectives, (3) Wireframing, (4) Visual Design, (5) Prototyping, (6) Usability Testing, (7) Launch & Iterate. Sanctum was doing 4/5/7 but skipping 1/2/3/6.
 - **Figma Design Basics Resource Library**: https://www.figma.com/resource-library/design-basics/
-  129+ articles on fundamentals: UI vs UX differences, 24 best fonts for websites, 100 colour combinations, cinemagraphs, design principles.
 - **Laws of UX**: https://lawsofux.com/
-  Core cognitive/interaction laws: Hick's Law (decision time increases with number of options), Fitts's Law (target size + distance affects speed), Miller's Law (7±2 working memory), Doherty Threshold (400ms response), Jakob's Law (users spend most time on other sites), F-pattern reading, Von Restorff Effect (distinctive items are remembered), Peak-End Rule, Tesler's Law (complexity is conserved, not eliminated), Fatigable Resources.
 - **Optimal Workshop — IA vs Navigation**: https://www.optimalworkshop.com/blog/information-architecture-vs-navigation-creating-a-seamless-user-experience
-  Dan Brown's 8 IA principles: Objects, Choices (less is more), Disclosure, Examples, Front Doors (50%+ enter via non-homepage), Multiple Classifications, Search (not IA substitute), Navigation.
 - **WCAG 2.2 Accessibility Guidelines**: https://www.w3.org/WAI/WCAG22/quickref/
-  Contrast: AA = 4.5:1 (normal text), AAA = 7:1. Focus Visible (2.4.7), Target Size Minimum (2.5.8): 24×24 CSS pixels. Focus Appearance (2.4.13), Focus Not Obscured (2.4.11/12).
 - **Udemy Free UI/UX Courses**: https://www.udemy.com/courses/search/?q=ui+ux+design&src=sac&kw=Ui&price=price-free
-  Free structured courses for learning the design process end-to-end.
 
-### Core UX Principles (from research synthesis)
+### UX — Structure & Experience
 
-- **User Needs & Research**: content audit → card sorting → tree testing → user flow diagram → prototype → test. You have under 2 seconds to communicate what a product does on first impression.
-- **Information Architecture**: 3 components — organizational structure, content structure, navigation structure.
-- **User Flows & Navigation**: minimize steps, progressive disclosure (5 options then sub-options beats 30 simultaneous), clear visual cues, consistent patterns.
-- **Mental Models**: align with existing user expectations (standard icons, familiar placement, predictable link behaviour).
-- **Cognitive Load**: chunk complex info, remove clutter, one focal task at a time.
-- **Visual Hierarchy**: size, colour, weight, spacing guide the eye to primary actions first.
-- **Consistency**: predictable patterns, reusable components, design systems build trust and muscle memory.
-- **Accessibility (a11y)**: sufficient contrast, legible typography, WCAG compliance, motor impairment support.
-- **Affordances & Signifiers**: button press states, active tab highlights, hover effects — make interactivity obvious.
-- **Mobile Responsiveness**: flexible layouts, touch-friendly sizes (44px minimum), proper spacing across screen sizes.
+#### User Needs & Research
+
+The core loop: **content audit → card sorting → tree testing → user flow diagram → prototype → test**. Card sorting reveals how users naturally categorize content (informed IA); tree testing measures findability using a stripped text-only sitemap; user flow diagrams visualize the paths between entry points and goals.
+
+Key insight: **test early and test often**. What you find "obvious" won't be obvious to a first-time user. You have under **2 seconds** to communicate what a product does on first impression; **87% of users** who find the right path after the first click will complete their task.
+
+**7-Step Process (UX Design Institute):**
+1. **User Research** — understand who, what problem, where friction occurs
+2. **Define Objectives** — measurable success criteria
+3. **Wireframing** — low-fi structure before pixels
+4. **Visual Design** — type, colour, spacing (this spec)
+5. **Prototyping** — interactive, clickable
+6. **Usability Testing** — real users, catch structural flaws before polish locks them in
+7. **Launch & Iterate** — monitor, measure, refine
+
+Sanctum was doing 4/5/7 but skipping 1/2/3/6.
+
+#### Information Architecture
+
+Three components that work together:
+1. **Organizational structure** — categories, subcategories, relationships
+2. **Content structure** — hierarchy and types of content
+3. **Navigation structure** — menus, links, search
+
+**Dan Brown's 8 IA Principles:**
+- **Objects** — treat content as living things with lifecycles
+- **Choices** — less is more
+- **Disclosure** — show previews of hidden content
+- **Examples** — show examples when describing categories
+- **Front Doors** — assume 50%+ use non-homepage entry points
+- **Multiple Classifications** — offer several browse schemes
+- **Focused Navigation** — keep it simple, never mix things
+- **Growth** — design for content that will grow
+
+#### User Flows & Navigation
+
+Effective navigation rests on three pillars: **clear labeling, logical grouping, consistency**. Keep navigation links minimal; group related content; use descriptive labels that reflect what's behind them.
+
+**Progressive disclosure** (show 5 options → 6 sub-options) beats flat breadth because Hick's Law makes sequential small decisions faster than one large simultaneous decision.
+
+#### Mental Models
+
+**Jakob's Law**: users spend most of their time on *other* products, so they expect yours to work the same way. Standard icon meanings, familiar placement (logo top-left, contact top-right, search top), predictable link behavior. Breaking these expectations forces learning and creates friction.
+
+#### Cognitive Load — The Three Quantitative Laws
+
+| Law | Formula / Rule | Design Implication |
+|-----|---------------|-------------------|
+| **Hick's Law** | T = a + b·log₂(n+1) | Decision time grows logarithmically with choice count. Fewer options = faster decisions. Use progressive disclosure. |
+| **Fitts's Law** | T = a + b·log₂(2D/W) | Target acquisition time depends on distance (D) and width (W). Bigger, closer targets are faster to hit. |
+| **Miller's Law** | 7±2 items in working memory | Don't exceed ~7 chunks per screen/menu. Group related items. |
+
+Fitts's and Hick's fire in sequence on every interaction: Fitts governs the *move* to a target, Hick governs the *decision* of which target to move to. A 2024 Nielsen Norman Group study found interfaces optimized with Fitts's + Hick's reduced task completion time by **30%**.
+
+**Additional cognitive principles (Laws of UX):**
+- **Doherty Threshold** — keep response time < 400ms or users lose the thread
+- **Chunking** — break info into meaningful groups
+- **Aesthetic-Usability Effect** — attractive interfaces are *perceived* as more usable
+- **Goal-Gradient Effect** — motivation increases as users approach completion (progress bars, "2 steps left")
+- **Peak-End Rule** — users judge experience by peak moment and ending, not average
+- **Zeigarnik Effect** — uncompleted tasks stick in memory (progress indicators leverage this)
+- **Von Restorff Effect** — the one different item in a group is most memorable (use for CTAs)
+- **Tesler's Law** — total complexity in a system is conserved; you can move it between expert vs. user, but not eliminate it
+- **Serial Position Effect** — first and last items in a list are best remembered
+
+#### Usability Testing
+
+Low-fi first: paper prototypes → wireframes → clickable prototypes → real product. Test at each stage. Card sorting for IA, tree testing for findability, first-click testing for homepage, task-based usability tests for flows. The goal is catching structural flaws before pixel-level polish locks them in.
+
+### UI — Look & Feel
+
+#### Visual Hierarchy
+
+Use **size, color, weight, spacing** to direct the eye. Primary actions get the largest type and the most contrast. Secondary content is smaller, lighter, or lower in the visual stack. The hierarchy should make the "what to do next" obvious without reading.
+
+#### Consistency
+
+Reusable components, established design systems, predictable patterns. Build for consistency across teams: shared component libraries, design tokens (layered and scoped for scale), and governance.
+
+#### Accessibility (WCAG 2.2)
+
+WCAG 2.2 (October 2023) added **9 new success criteria** over 2.1:
+
+| Criterion | Level | Requirement |
+|-----------|-------|-------------|
+| 1.4.3 Contrast (Minimum) | AA | 4.5:1 for normal text, 3:1 for large text (≥18pt/24px) |
+| 1.4.6 Contrast (Enhanced) | AAA | 7:1 for normal text, 4.5:1 for large text |
+| 2.4.7 Focus Visible | AA | Keyboard focus indicator must be visible |
+| 2.4.11 Focus Not Obscured (Min) | AA | Focused element not fully hidden by sticky headers/footers |
+| 2.4.12 Focus Not Obscured (Enhanced) | AAA | Focused element not obscured at all |
+| 2.4.13 Focus Appearance | AAA | Sufficient area and contrast for the focus indicator |
+| 2.5.7 Dragging Movements | AA | Alternatives to drag-only interactions |
+| **2.5.8 Target Size (Minimum)** | **AA** | **Interactive targets ≥ 24×24 CSS px** (or sufficient spacing) |
+| 3.2.6 Consistent Help | AA | Help contact, search, feedback in consistent location |
+| 3.3.7 Redundant Entry | A | Don't re-ask for data the user already provided |
+| 3.3.8 Accessible Authentication (Min) | AA | No cognitive function tests (e.g., "type the characters in this image") |
+
+**Target size detail:** 24×24px is the AA floor. For AAA, targets should be 44×44px. On mobile, thumb reach means bottom-third placement is king.
+
+#### Affordances & Signifiers
+
+Make interactive elements *obvious*: button press states (scale down, darken), active tab highlights, hover effects (cursor change + color/size shift), focus rings. If a user can't tell what's clickable without trying, the affordance is missing.
+
+#### Mobile Responsiveness
+
+- Flexible layouts (container queries, CSS Grid)
+- Touch targets ≥ 44×44px on mobile (Apple HIG) / ≥ 24×24px (WCAG 2.2 AA floor)
+- Spacing between targets ≥ 8px to prevent mis-taps
+- Text scales: test at 100%, 150%, 200% (Sanctum already has this as a canvas scenario)
+- Thumb-first layout: primary actions in the bottom third
+
+### The 30 Laws of UX (complete reference)
+
+1. Aesthetic-Usability Effect
+2. Choice Overload (Paradox of Choice)
+3. Chunking
+4. Cognitive Bias
+5. Cognitive Load
+6. Doherty Threshold (<400ms)
+7. Fitts's Law
+8. Flow
+9. Goal-Gradient Effect
+10. Hick's Law
+11. Jakob's Law
+12. Law of Common Region
+13. Law of Proximity
+14. Law of Prägnanz (simplicity)
+15. Law of Similarity
+16. Law of Uniform Connectedness
+17. Mental Model
+18. Miller's Law (7±2)
+19. Occam's Razor
+20. Paradox of the Active User
+21. Pareto Principle (80/20)
+22. Parkinson's Law
+23. Peak-End Rule
+24. Postel's Law (liberal in input, conservative in output)
+25. Selective Attention
+26. Serial Position Effect (primacy + recency)
+27. Tesler's Law (conservation of complexity)
+28. Von Restorff Effect (isolation)
+29. Working Memory
+30. Zeigarnik Effect (uncompleted tasks)
 
 ### Design Application Platforms & Frameworks (researched for customer-facing design options)
 
